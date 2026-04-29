@@ -2,3 +2,6 @@
 content/*/
 testing/
 training/
+
+# ignore model weight files
+*.pth
