@@ -1,12 +1,18 @@
 import os
 import shutil
 
-CONTENT_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.abspath(__file__))
+CONTENT_DIR = os.path.join(ROOT, "content")
 EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".bmp", ".tiff"}
 
 SOURCES = {
-    "training_photos": ["photos_fiftyone", "photos_mine"],
-    "training_artwork": ["artwork"],
+    os.path.join(ROOT, "training", "photos"): [
+        os.path.join(CONTENT_DIR, "photos_fiftyone"),
+        os.path.join(CONTENT_DIR, "photos_mine"),
+    ],
+    os.path.join(ROOT, "training", "artwork"): [
+        os.path.join(CONTENT_DIR, "artwork"),
+    ],
 }
 
 
@@ -30,13 +36,12 @@ def copy_images(src_dir, dst_dir):
 
 def main():
     for target, sources in SOURCES.items():
-        dst_dir = os.path.join(CONTENT_DIR, target)
+        dst_dir = target
         os.makedirs(dst_dir, exist_ok=True)
         total = 0
-        for src_name in sources:
-            src_dir = os.path.join(CONTENT_DIR, src_name)
+        for src_dir in sources:
             n = copy_images(src_dir, dst_dir)
-            print(f"  {src_name} -> {target}: {n} images")
+            print(f"  {os.path.basename(src_dir)} -> {os.path.basename(dst_dir)}: {n} images")
             total += n
         print(f"  total in {target}: {total}\n")
 

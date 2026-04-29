@@ -1,5 +1,6 @@
 import os
 import sys
+import shutil
 import torch
 import torch.nn.functional as F
 from torchvision import transforms, models
@@ -60,12 +61,16 @@ def classify_folder(folder_path):
             top_class, confidence, scores = classify_image(model, classes, path)
             score_str = "  ".join(f"{k}: {v}" for k, v in scores.items())
             print(f"{filename:<40} {top_class:<16} {confidence:.2%}        {score_str}")
+            dest_dir = os.path.join(folder_path, top_class)
+            os.makedirs(dest_dir, exist_ok=True)
+            shutil.copy2(path, os.path.join(dest_dir, filename))
         except Exception as e:
             print(f"{filename:<40} ERROR: {e}")
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python inference.py <folder_path>")
-        sys.exit(1)
-    classify_folder(sys.argv[1])
+    if len(sys.argv) == 2:
+        folder = sys.argv[1]
+    else:
+        folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "testing")
+    classify_folder(folder)

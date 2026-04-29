@@ -1,2 +1,4 @@
 # ignore only subdirs within content, let's track the scripts
 content/*/
+testing/
+training/

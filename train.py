@@ -5,7 +5,8 @@ from torch.utils.data import DataLoader, random_split
 from torchvision import datasets, transforms, models
 from torchvision.models import MobileNet_V3_Small_Weights
 
-DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(ROOT, "training")
 BATCH_SIZE = 32
 EPOCHS_FROZEN = 5
 EPOCHS_UNFROZEN = 10
@@ -13,7 +14,7 @@ LR_FROZEN = 1e-3
 LR_UNFROZEN = 1e-4
 VAL_SPLIT = 0.2
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-SAVE_PATH = os.path.join(DATA_DIR, "model.pth")
+SAVE_PATH = os.path.join(ROOT, "model.pth")
 
 train_transforms = transforms.Compose([
     transforms.Resize((224, 224)),
