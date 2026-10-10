@@ -32,6 +32,10 @@ class StubTagSuggester:
     def __init__(self, root, directory, spec, bundle):
         self.bundle = bundle
 
+    def embed_text(self, text):
+        StubTagSuggester.last_call = {"text": text}
+        return [0.5, 0.5, 0.5, 0.5]
+
     def suggest(self, image_bytes, candidates, vector):
         StubTagSuggester.last_call = {"candidates": candidates, "vector": vector}
         return [{"label": label, "score": 0.1} for label in candidates[:12]]

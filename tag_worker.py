@@ -44,6 +44,13 @@ class TagWorker:
                 self.adapter = getattr(import_module(module),factory)(self.assets,self.directory,self.spec,self.bundle)
         if request['method'] == 'tags.load':
             return metadata
+        if request['method'] == 'tags.embedText':
+            text = request.get('text')
+            if not isinstance(text, str) or not text.strip() or len(text) > 300:
+                raise ValueError('Search text must be 1 to 300 characters.')
+            with redirect_stdout(sys.stderr):
+                vector = self.adapter.embed_text(text.strip())
+            return {**metadata, 'text': text.strip(), 'vector': vector}
         if request['method'] != 'tags.suggest':
             raise ValueError('Unknown tag suggestion method.')
         path = Path(request['imagePath'])

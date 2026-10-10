@@ -99,3 +99,17 @@ def test_cached_vector_only_reused_with_matching_embedding_key(ml_root, image_fi
 def test_tag_suggest_rejects_changed_image(ml_root, image_file):
     with pytest.raises(ValueError, match="changed since import"):
         TagWorker(ml_root).dispatch({"method": "tags.suggest", "assetId": "a", "imagePath": str(image_file), "contentHash": "bad"})
+
+
+def test_embed_text_returns_query_vector_with_model_metadata(ml_root):
+    result = TagWorker(ml_root).dispatch({"method": "tags.embedText", "text": "  blue city at night "})
+    assert result["vector"] == [0.5, 0.5, 0.5, 0.5]
+    assert result["text"] == "blue city at night"
+    assert result["compatibleEmbeddingKey"] == "vision-key"
+    assert StubTagSuggester.last_call == {"text": "blue city at night"}
+
+
+@pytest.mark.parametrize("text", ["", "   ", None, "x" * 301])
+def test_embed_text_rejects_empty_or_overlong_queries(ml_root, text):
+    with pytest.raises(ValueError):
+        TagWorker(ml_root).dispatch({"method": "tags.embedText", "text": text})

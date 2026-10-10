@@ -15,6 +15,14 @@ class SiglipTagSuggester:
         self.cache = OrderedDict()
         self.vision = None
 
+    def embed_text(self, text):
+        """Embeds a search query into the image embedding space."""
+        tokens = self.tokenizer([self.bundle['prompt'].format(text)],
+            padding='max_length',max_length=64,truncation=True,return_tensors='pt')
+        with torch.inference_mode():
+            vector = self.model(**tokens).pooler_output.float()
+        return torch.nn.functional.normalize(vector,dim=-1)[0].tolist()
+
     def suggest(self, image_bytes, candidates, vector):
         if vector is None:
             if self.vision is None:
