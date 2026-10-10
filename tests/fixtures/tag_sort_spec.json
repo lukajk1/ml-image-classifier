@@ -1,0 +1,388 @@
+{
+ "spec": 1,
+ "about": "Shared by umbra-tags-ml/tests/test_tag_sort.py and umbra-tags-flutter/test/tag_sort_test.dart; keep both copies identical.",
+ "constants": {
+  "NEIGHBOURS": 10,
+  "NEIGHBOUR_TEMPERATURE": 0.05,
+  "CENTROID_TEMPERATURE": 0.03,
+  "NAME_TEMPERATURE": 0.01,
+  "KNN_WEIGHT": 0.5,
+  "NAME_WEIGHT": 0.2
+ },
+ "cases": [
+  {
+   "name": "blended with a shared member, the image itself and an empty tag",
+   "image": [
+    0.9,
+    0.3,
+    0.1,
+    0
+   ],
+   "excludeId": "img",
+   "candidates": [
+    {
+     "id": "weapon",
+     "nameVector": [
+      0.501671,
+      0.487384,
+      0.528688,
+      0.480907
+     ],
+     "members": [
+      {
+       "id": "w0",
+       "vector": [
+        0.961769,
+        0.112428,
+        -0.249686,
+        0.0042
+       ]
+      },
+      {
+       "id": "w1",
+       "vector": [
+        0.879672,
+        0.195035,
+        -0.314232,
+        -0.298995
+       ]
+      },
+      {
+       "id": "w2",
+       "vector": [
+        0.891475,
+        0.369874,
+        -0.210768,
+        -0.155058
+       ]
+      }
+     ]
+    },
+    {
+     "id": "cosmetic",
+     "nameVector": [
+      0.498992,
+      0.524051,
+      0.495054,
+      0.480937
+     ],
+     "members": [
+      {
+       "id": "c0",
+       "vector": [
+        0.302421,
+        0.77041,
+        0.545125,
+        -0.133598
+       ]
+      },
+      {
+       "id": "w1",
+       "vector": [
+        0.879672,
+        0.195035,
+        -0.314232,
+        -0.298995
+       ]
+      }
+     ]
+    },
+    {
+     "id": "typography",
+     "nameVector": [
+      0.482888,
+      0.48072,
+      0.496343,
+      0.537932
+     ],
+     "members": []
+    },
+    {
+     "id": "self",
+     "nameVector": null,
+     "members": [
+      {
+       "id": "img",
+       "vector": [
+        0.943456,
+        0.314485,
+        0.104828,
+        0.0
+       ]
+      }
+     ]
+    }
+   ],
+   "expected": [
+    {
+     "confidence": 0.6992667006678416,
+     "example": 0.7683867234610594,
+     "knn": 0.8982677808289894,
+     "centroid": 0.6385056660931294,
+     "name": 0.3536665867017524,
+     "votes": 3,
+     "members": 3
+    },
+    {
+     "confidence": 0.2949449251662432,
+     "example": 0.23161327653894057,
+     "knn": 0.10173221917101051,
+     "centroid": 0.36149433390687064,
+     "name": 0.6116031683027564,
+     "votes": 2,
+     "members": 2
+    },
+    {
+     "confidence": 0.0057883741659152015,
+     "example": 0.0,
+     "knn": 0.0,
+     "centroid": 0.0,
+     "name": 0.034730244995491204,
+     "votes": 0,
+     "members": 0
+    },
+    {
+     "confidence": 0.0,
+     "example": 0.0,
+     "knn": 0.0,
+     "centroid": 0.0,
+     "name": 0.0,
+     "votes": 0,
+     "members": 0
+    }
+   ]
+  },
+  {
+   "name": "examples only, more labelled images than neighbours",
+   "image": [
+    0.6,
+    0.5,
+    0.4,
+    0.1
+   ],
+   "excludeId": null,
+   "candidates": [
+    {
+     "id": "a",
+     "nameVector": null,
+     "members": [
+      {
+       "id": "a00",
+       "vector": [
+        0.766931,
+        0.06724,
+        0.629475,
+        -0.105146
+       ]
+      },
+      {
+       "id": "a01",
+       "vector": [
+        0.918602,
+        -0.309478,
+        0.130669,
+        -0.208136
+       ]
+      },
+      {
+       "id": "a02",
+       "vector": [
+        0.953291,
+        -0.048256,
+        0.29267,
+        0.057023
+       ]
+      },
+      {
+       "id": "a03",
+       "vector": [
+        0.781123,
+        -0.129994,
+        0.596873,
+        0.12919
+       ]
+      },
+      {
+       "id": "a04",
+       "vector": [
+        0.796617,
+        0.059639,
+        0.521033,
+        0.300615
+       ]
+      },
+      {
+       "id": "a05",
+       "vector": [
+        0.779626,
+        -0.111751,
+        0.582396,
+        -0.201269
+       ]
+      },
+      {
+       "id": "a06",
+       "vector": [
+        0.951401,
+        0.209434,
+        0.225596,
+        -0.008989
+       ]
+      }
+     ]
+    },
+    {
+     "id": "b",
+     "nameVector": null,
+     "members": [
+      {
+       "id": "b00",
+       "vector": [
+        -0.265142,
+        0.816046,
+        0.511862,
+        0.042019
+       ]
+      },
+      {
+       "id": "b01",
+       "vector": [
+        0.268587,
+        0.760921,
+        0.586774,
+        0.067505
+       ]
+      },
+      {
+       "id": "b02",
+       "vector": [
+        0.049642,
+        0.749468,
+        0.599576,
+        0.2763
+       ]
+      },
+      {
+       "id": "b03",
+       "vector": [
+        -0.017979,
+        0.981584,
+        0.128876,
+        0.139859
+       ]
+      },
+      {
+       "id": "b04",
+       "vector": [
+        0.073536,
+        0.871211,
+        0.473279,
+        -0.107661
+       ]
+      },
+      {
+       "id": "b05",
+       "vector": [
+        -0.079789,
+        0.991105,
+        0.103091,
+        -0.026761
+       ]
+      }
+     ]
+    }
+   ],
+   "expected": [
+    {
+     "confidence": 0.7505521801217889,
+     "example": 0.7505521801217889,
+     "knn": 0.5822950964562359,
+     "centroid": 0.9188092637873418,
+     "name": 0.0,
+     "votes": 6,
+     "members": 7
+    },
+    {
+     "confidence": 0.24944781987821105,
+     "example": 0.24944781987821105,
+     "knn": 0.41770490354376394,
+     "centroid": 0.08119073621265815,
+     "name": 0.0,
+     "votes": 4,
+     "members": 6
+    }
+   ]
+  },
+  {
+   "name": "names only",
+   "image": [
+    0.5,
+    0.4,
+    0.1,
+    0.05
+   ],
+   "excludeId": null,
+   "candidates": [
+    {
+     "id": "sky",
+     "nameVector": [
+      0.490323,
+      0.486102,
+      0.481284,
+      0.54005
+     ],
+     "members": []
+    },
+    {
+     "id": "tree",
+     "nameVector": [
+      0.476732,
+      0.486323,
+      0.497945,
+      0.536905
+     ],
+     "members": []
+    },
+    {
+     "id": "car",
+     "nameVector": [
+      0.466655,
+      0.496157,
+      0.504181,
+      0.530908
+     ],
+     "members": []
+    }
+   ],
+   "expected": [
+    {
+     "confidence": 0.5411232443903975,
+     "example": 0.0,
+     "knn": 0.0,
+     "centroid": 0.0,
+     "name": 0.5411232443903975,
+     "votes": 0,
+     "members": 0
+    },
+    {
+     "confidence": 0.2432119027818758,
+     "example": 0.0,
+     "knn": 0.0,
+     "centroid": 0.0,
+     "name": 0.2432119027818758,
+     "votes": 0,
+     "members": 0
+    },
+    {
+     "confidence": 0.2156648528277267,
+     "example": 0.0,
+     "knn": 0.0,
+     "centroid": 0.0,
+     "name": 0.2156648528277267,
+     "votes": 0,
+     "members": 0
+    }
+   ]
+  }
+ ]
+}

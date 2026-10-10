@@ -181,3 +181,66 @@ Image vectors are reused only when their model key matches the text bundle's
 The source image SHA-256 is verified even when a cached vector is supplied. The
 vision bundle/embedding key is unchanged by adding text support, so existing
 similarity indexes do not need rebuilding. Runtime remains entirely offline.
+
+
+## AI sort into existing tags
+
+The Flutter app's **Edit → AI sort…** suggests tags the library already has, one
+image at a time: untagged images into top-level tags, or a tag's images into its
+child tags. `tag_sort.py` is the scoring spec; `lib/ml/tag_sort.dart` in the
+Flutter repo mirrors it and runs on the library worker isolate over the stored
+SigLIP 2 vectors. Both test suites check the same fixture,
+`tests/fixtures/tag_sort_spec.json` (an identical copy lives in the Flutter repo's
+`test/fixtures`), so change the two implementations and the fixture together.
+
+For an image and candidate tags (members = non-archived images in the tag's
+subtree, never the image itself):
+
+- **kNN**: the 10 most similar labelled images vote for their tags, weighted
+  `exp((cos - 1) / 0.05)`; shares sum to 1.
+- **centroid**: softmax over the cosine to each tag's mean vector, temperature 0.03.
+- **examples** = 0.5 · kNN + 0.5 · centroid.
+- **name**: softmax over the SigLIP text-image cosine of each tag name (same prompt
+  as `tags.suggest`), temperature 0.01. Image-image and text-image cosines live on
+  different scales, so each signal is turned into a distribution first.
+- **confidence** = (examples + 0.2 · name) / 1.2; names alone when no candidate has
+  images yet, examples alone when the text encoder is unavailable.
+
+A per-tag weight `n/(n+k0)` that leaned on names for small tags was tried and
+lost 3-17 points of top-1 against the same example signals here, because tag names in a personal library are often
+project names the text encoder cannot know; a small fixed name weight was kept.
+
+## Evaluation
+
+`evaluate_tag_sort.py` opens a library's `catalog.sqlite` read-only (SQLite
+`mode=ro`), embeds the tag names with the bundled text encoder and runs
+leave-one-out over images that already have tags: each image is scored as if it
+were unsorted. A top-1 hit means the best suggestion is one of the image's tags at
+that level; top-3 means one of the first three is.
+
+```powershell
+.venv/Scripts/python.exe evaluate_tag_sort.py "<library folder>" [--shots 3] [--json out.json]
+```
+
+Measured 2026-10-10 on the author's library (1,370 images, 791 indexed and tagged
+at the time, 18 tags):
+
+| Mode | Images | Candidates | Name only (top-1 / top-3) | Examples only | **Blended (shipped)** |
+|---|---:|---:|---|---|---|
+| 1: top-level tags | 791 | 10 | 19.0% / 43.7% | 78.5% / 97.0% | **78.9% / 96.2%** |
+| 2: child tags (1 parent with 4 children) | 61 | 4 | 34.4% / 98.4% | 95.1% / 98.4% | **95.1% / 100%** |
+
+Components on their own, mode 1: kNN 78.5% / 94.9%, centroid 65.0% / 96.0%.
+Chance top-1 is 10% (mode 1) and 25% (mode 2).
+
+New tags (`--shots 3`: each tag keeps 3 random example images, the rest are
+scored): mode 1 blended 53.3% / 78.1% (examples only 54.5% / 79.9%, centroid
+only 56.0% / 85.6%, name only 18.0% / 43.0%), 763 images; mode 2 66.7% / 100%,
+51 images. With few examples the centroid carries the ranking, which is why the
+blend keeps it alongside kNN.
+
+Mode 2 has a single parent with two or more children in this library, so its
+sample is small. Numbers move as the library is tagged and indexed; rerun the
+script to refresh them. Tests (`tests/test_tag_sort.py`) cover the math with
+tiny synthetic vectors and run the script on a synthetic catalog; they need no
+model weights.
