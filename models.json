@@ -1,0 +1,7 @@
+{
+  "defaultModel": "artwork-photos-best",
+  "models": [
+    {"id": "artwork-photos-best", "name": "Artwork / Photos — best (newer)", "adapter": "ml_adapters.mobilenet:MobileNetClassifier", "checkpoint": "best_model.pth"},
+    {"id": "artwork-photos-original", "name": "Artwork / Photos — original", "adapter": "ml_adapters.mobilenet:MobileNetClassifier", "checkpoint": "model.pth"}
+  ]
+}
