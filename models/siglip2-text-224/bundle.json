@@ -1,0 +1,16 @@
+{
+  "modelId": "google/siglip2-base-patch16-224",
+  "revision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+  "compatibleEmbeddingKey": "382da617a3022405efef3cdca8bbcd07e78b8801713adb6da13c9389b22f465b",
+  "dimension": 768,
+  "prompt": "This is a photo of {}.",
+  "recipe": "siglip-tag-ranking-v1",
+  "files": {
+    "chat_template.jinja": "f2bced8fd992f22f081f65a5bdc4319d41c30c823e1ebde3cfe22b9e5447b426",
+    "config.json": "02465e238ac78e974ac439c126b6ee7374dbf9dbd85f88c083e7d02ff05bfe08",
+    "model.safetensors": "44b00f3cfad8527c8c7a78735056d10331b8afeb028a0c769c3f21ad0fb8ab92",
+    "special_tokens_map.json": "030953d237fbebe6f5545f92f839cd6cffbdcd3cba3e7acf710f288c66b7b694",
+    "tokenizer.model": "61a7b147390c64585d6c3543dd6fc636906c9af3865a5548f27f31aee1d4c8e2",
+    "tokenizer_config.json": "b9a76e9dde91cdf51bae9652712ca8df8b49acf3a6bcdea8fc0f0649d4926767"
+  }
+}

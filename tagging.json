@@ -1,0 +1,6 @@
+{
+  "adapter": "ml_adapters.siglip_tags:SiglipTagSuggester",
+  "directory": "models/siglip2-text-224",
+  "visionDirectory": "models/siglip2-base-224",
+  "vocabulary": "tag_vocabulary.json"
+}
