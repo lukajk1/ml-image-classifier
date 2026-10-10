@@ -1,0 +1,4 @@
+{
+  "adapter": "ml_adapters.siglip:SiglipEmbedder",
+  "directory": "models/siglip2-base-224"
+}

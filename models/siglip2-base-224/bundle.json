@@ -1,0 +1,11 @@
+{
+  "modelId": "google/siglip2-base-patch16-224",
+  "revision": "75de2d55ec2d0b4efc50b3e9ad70dba96a7b2fa2",
+  "preprocessingVersion": "siglip2-224-pil-exif-rgb-v1",
+  "dimension": 768,
+  "files": {
+    "config.json": "7bfb482b7233775b49014f5b9967b94b893793073918d5aa7b273c98031287fa",
+    "preprocessor_config.json": "0540e59bcd8f44c3d097169b846c4745186805fce5a876036f3f8c6d9edfcc32",
+    "model.safetensors": "47b2fedf5dffe18405c5b6d9e9c6147e4648046d1ddff82364f330abf0a5bf2d"
+  }
+}
