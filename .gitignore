@@ -5,3 +5,13 @@ training/
 
 # ignore model weight files
 *.pth
+.venv/
+__pycache__/
+*.pyc
+
+# Recreated by prepare_similarity_model.py and included in release packages.
+models/**/*.safetensors
+
+# Local image datasets
+training-similar-feel/
+training.zip
