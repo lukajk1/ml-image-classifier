@@ -210,6 +210,28 @@ A per-tag weight `n/(n+k0)` that leaned on names for small tags was tried and
 lost 3-17 points of top-1 against the same example signals here, because tag names in a personal library are often
 project names the text encoder cannot know; a small fixed name weight was kept.
 
+## Find matching images
+
+"Find matching images…" on a tag ranks every image outside it (the tag or a
+descendant) for one tag. `tag_match.py` is the reference; the Flutter app mirrors
+it in `lib/ml/tag_match.dart` and scores the whole library in one pass over the
+stored vectors (`matchScores` on the library worker), with the tag name embedded
+once by `tags.embedText`. `tests/fixtures/tag_match_spec.json` pins both.
+
+- **example** = 0.5 · cosine to the tag's centroid (renormalized mean of its
+  images' unit vectors) + 0.5 · mean of the 5 highest cosines to its images.
+- **name**: SigLIP text-image cosine of the tag name.
+- **score** = example + w · (sd(example) / sd(name)) · (name − mean(name)), sds
+  and means over the scored images. This ranks like z(example) + w · z(name) but
+  keeps example (cosine) units, so the name is a bonus or penalty around zero.
+- **w** is set per tag from its own images: d_name / d_example, clamped to
+  [0, 2], where d = (mean over the tag's images − mean over scored images) / sd
+  over scored images, using leave-one-out example scores for the tag's images.
+  A name that does not describe the tag's images gets 0. One image in the tag:
+  w = 1. No images: the raw name cosine (the old behaviour).
+- **default threshold**: the median leave-one-out score of the tag's own images,
+  i.e. "at least as close as a typical image already in the tag".
+
 ## Evaluation
 
 `evaluate_tag_sort.py` opens a library's `catalog.sqlite` read-only (SQLite
@@ -244,3 +266,38 @@ sample is small. Numbers move as the library is tagged and indexed; rerun the
 script to refresh them. Tests (`tests/test_tag_sort.py`) cover the math with
 tiny synthetic vectors and run the script on a synthetic catalog; they need no
 model weights.
+
+### Find matching images
+
+`evaluate_tag_match.py` opens the catalog the same read-only way. For each tag
+with at least 10 indexed images (its own or a descendant's), 30% of them are
+hidden (5 seeds); the rest serve as the tag's images, and the hidden ones plus
+every image outside the tag are ranked. AUC-ROC is the chance a hidden image
+outranks an outside one; precision@k is the share of hidden images in the top k,
+k = number hidden. Averaged over tags.
+
+```powershell
+.venv/Scripts/python.exe evaluate_tag_match.py "<library folder>" [--per-tag] [--json out.json]
+```
+
+Measured 2026-10-11 on the author's library (1,376 indexed images, 12 tags with
+10 or more images):
+
+| Method | AUC-ROC | Precision@k |
+|---|---:|---:|
+| Name only (before) | 0.645 | 0.087 |
+| Examples only | 0.821 | 0.238 |
+| Fixed name weight 0.1 / 0.2 / 0.3 | 0.822 / 0.821 / 0.818 | 0.236 / 0.232 / 0.218 |
+| Fixed name weight 0.5 / 1.0 | 0.807 / 0.777 | 0.188 / 0.166 |
+| **Adaptive name weight (shipped)** | **0.835** | **0.247** |
+
+Parts on their own: centroid 0.809 / 0.212, top-5 0.827 / 0.242. The adaptive
+weight averaged 0.47, was 0 for 3 of the 12 tags (ARKVAIN, artsy, env) and under
+0.2 for 3 more: many tag names here are project names or loose labels the text
+encoder cannot tie to the images, and a fixed weight dilutes the examples there. Where the name fits the images ("graphic design":
+name only 0.916, examples only 0.621, adaptive 0.865) the adaptive weight
+recovers most of it. At the default threshold (median member score) the scan
+preselects 120 images per tag on average with recall 0.51 and precision 0.17;
+precision is a lower bound because untagged images that belong in a tag count
+as misses. Tests (`tests/test_tag_match.py`) cover the math and run the script
+on a synthetic catalog without model weights.
